@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sorteio de Times</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #e74c3c;
+        --accent-color: #3498db;
+        --light-color: #ecf0f1;
+        --dark-color: #2c3e50;
+        --success-color: #27ae60;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--dark-color);
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--accent-color)
+        );
+        color: white;
+        border-radius: 0 0 20px 20px;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .card-team {
+        background: linear-gradient(135deg, #ffffff, #f9f9f9);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-left: 6px solid var(--accent-color);
+      }
+
+      .card-team:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+      }
+
+      .card-team h5 {
+        color: var(--dark-color);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .card-team ul {
+        padding-left: 1rem;
+        margin-bottom: 0;
+      }
+
+      .card-team li {
+        font-size: 1rem;
+        padding: 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .card-team li::before {
+        content: "🏐";
+      }
+
+      .icon-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+      }
+
+      .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+      }
+
+      .btn-success:hover {
+        background-color: #219653;
+        border-color: #219653;
+        transform: translateY(-2px);
+      }
+
+      .btn-outline-danger:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+      }
+
+      .input-group {
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+      }
+
+      .form-control,
+      .form-select {
+        border-radius: 8px !important;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ddd;
+        transition: all 0.2s;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+      }
+
+      #playerList {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        border-radius: 8px !important;
+        border: 1px solid #ddd;
+      }
+
+      .list-group-item {
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s;
+      }
+
+      .list-group-item:hover {
+        background-color: var(--light-color);
+      }
+
+      .remove-player {
+        color: #e74c3c;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.2s;
+      }
+
+      .remove-player:hover {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      .teams-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .players-count {
+        background-color: var(--accent-color);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #7f8c8d;
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #bdc3c7;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .team-icon {
+        color: var(--accent-color);
+        margin-right: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 1.5rem 0;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .teams-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <div class="header text-center">
+      <div class="container">
+        <h1 class="mb-3">
+          <i class="fas fa-volleyball-ball me-2"></i> Sorteio de Times
+        </h1>
+        <p class="lead mb-0">Crie times equilibrados para seu jogo</p>
+      </div>
+    </div>
+
+    <div class="container py-3">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="mb-4 input-group shadow-sm">
+            <input
+              type="text"
+              id="playerInput"
+              class="form-control"
+              placeholder="Digite o nome do jogador"
+              onkeypress="if(event.key === 'Enter') addPlayer()"
+            />
+            <button onclick="addPlayer()" class="btn btn-primary ps-4 pe-4">
+              <i class="fas fa-user-plus me-2"></i> Adicionar
+            </button>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="fas fa-users me-2"></i>Jogadores
+              <span class="players-count" id="playersCount">0</span>
+            </h5>
+            <button
+              class="btn btn-sm btn-outline-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#confirmClearModal"
+              id="clearBtn"
+              disabled
+            >
+              <i class="fas fa-trash me-1"></i> Limpar
+            </button>
+          </div>
+
+          <ul id="playerList" class="list-group mb-4 shadow-sm"></ul>
+
+          <div id="emptyState" class="empty-state">
+            <i class="fas fa-user-friends"></i>
+            <h4>Nenhum jogador adicionado</h4>
+            <p>Adicione os nomes dos jogadores para começar o sorteio</p>
+          </div>
+
+          <div class="card shadow-sm mb-5">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-cog me-2"></i>Configurações do Sorteio
+              </h5>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mb-3">
+                  <label for="playersPerTeam" class="form-label fw-semibold">
+                    <i class="fas fa-users me-2"></i>Jogadores por time:
+                  </label>
+                  <select id="playersPerTeam" class="form-select shadow-sm">
+                    <option value="2">2 jogadores</option>
+                    <option value="3">3 jogadores</option>
+                    <option value="4" selected>4 jogadores</option>
+                    <option value="5">5 jogadores</option>
+                    <option value="6">6 jogadores</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-info-circle me-2"></i>Total de jogadores:
+                  </label>
+                  <div class="alert alert-light">
+                    <span id="totalPlayers">0</span> jogadores - Formará
+                    <span id="totalTeams">0</span> times
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+                <button
+                  onclick="drawTeams()"
+                  class="btn btn-success icon-button shadow-sm"
+                  id="drawBtn"
+                  disabled
+                >
+                  <i class="fas fa-random me-1"></i> Sortear Times
+                </button>
+                <button
+                  onclick="copyTeamsToClipboard()"
+                  class="btn btn-outline-primary icon-button shadow-sm"
+                  id="copyBtn"
+                  disabled
+                >
+                  <i class="fas fa-copy me-1"></i> Copiar Times
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="teamsResults" class="mb-5" style="display: none">
+            <h3 class="mb-4">
+              <i class="fas fa-users me-2"></i>Times Sorteados
+            </h3>
+
+            <div id="teams" class="teams-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let players = [];
+      let teams = [];
+
+      // Carrega jogadores do localStorage se existirem
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedPlayers = localStorage.getItem("volleyballPlayers");
+        if (savedPlayers) {
+          players = JSON.parse(savedPlayers);
+          updatePlayerList();
+          updateCounts();
+        }
+      });
+
+      function addPlayer() {
+        const name = document.getElementById("playerInput").value.trim();
+        if (name) {
+          players.push(name);
+          document.getElementById("playerInput").value = "";
+          updatePlayerList();
+          updateCounts();
+          savePlayers();
+          document.getElementById("playerInput").focus();
+        }
+      }
+
+      function updatePlayerList() {
+        const ul = document.getElementById("playerList");
+        ul.innerHTML = "";
+
+        if (players.length > 0) {
+          document.getElementById("emptyState").style.display = "none";
+          document.getElementById("clearBtn").disabled = false;
+          document.getElementById("drawBtn").disabled = players.length < 2;
+        } else {
+          document.getElementById("emptyState").style.display = "block";
+          document.getElementById("clearBtn").disabled = true;
+          document.getElementById("drawBtn").disabled = true;
+          document.getElementById("teamsResults").style.display = "none";
+        }
+
+        players.forEach((name, index) => {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.innerHTML = `
+            <span>${name}</span>
+            <i class="fas fa-times remove-player" onclick="removePlayer(${index})"></i>
+          `;
+          ul.append(li);
+        });
+      }
+
+      function removePlayer(index) {
+        players.splice(index, 1);
+        updatePlayerList();
+        updateCounts();
+        savePlayers();
+      }
+
+      function confirmClearPlayers() {
+        players = [];
+        teams = [];
+        updatePlayerList();
+        updateCounts();
+        document.getElementById("teamsResults").style.display = "none";
+        savePlayers();
+
+        // Fechar modal
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("confirmClearModal")
+        );
+        modal.hide();
+
+        showToast("Lista de jogadores limpa com sucesso!", "success");
+      }
+
+      function shuffle(a) {
+        const arr = a.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function drawTeams() {
+        const perTeam = +document.getElementById("playersPerTeam").value;
+        if (players.length < perTeam) {
+          alert(
+            `É necessário pelo menos ${perTeam} jogadores para formar um time.`
+          );
+          return;
+        }
+
+        const shuffled = shuffle(players);
+        teams = [];
+        for (let i = 0; i < shuffled.length; i += perTeam) {
+          teams.push(shuffled.slice(i, i + perTeam));
+        }
+
+        renderTeams();
+        document.getElementById("teamsResults").style.display = "block";
+        document.getElementById("copyBtn").disabled = false;
+
+        // Scroll para os times sorteados
+        document
+          .getElementById("teamsResults")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function renderTeams() {
+        const container = document.getElementById("teams");
+        container.innerHTML = "";
+
+        if (teams.length === 0) {
+          container.innerHTML = "<p>Nenhum time foi formado ainda.</p>";
+          return;
+        }
+
+        // Cores diferentes para cada time
+        const teamColors = [
+          "#3498db",
+          "#e74c3c",
+          "#2ecc71",
+          "#f39c12",
+          "#9b59b6",
+          "#1abc9c",
+        ];
+
+        teams.forEach((team, idx) => {
+          const color = teamColors[idx % teamColors.length];
+          const card = document.createElement("div");
+          card.className = "card-team";
+          card.style.borderLeftColor = color;
+          card.innerHTML = `
+            <h5><i class="fas fa-users team-icon" style="color: ${color}"></i> Time ${
+            idx + 1
+          }</h5>
+            <ul class="mt-2 mb-0">
+              ${team.map((p) => `<li>${p}</li>`).join("")}
+            </ul>
+            <div class="mt-2 text-muted small">${team.length} jogadores</div>
+          `;
+          container.append(card);
+        });
+      }
+
+      function copyTeamsToClipboard() {
+        if (teams.length === 0) {
+          showToast("Nenhum time formado para copiar.", "danger");
+          return;
+        }
+
+        let text = `🏐 Times Sorteados - ${new Date().toLocaleDateString()} 🏐\n`;
+
+        teams.forEach((t, i) => {
+          text += `\n📋 Time ${i + 1}:\n`;
+          t.forEach((player) => {
+            text += `- ${player}\n`;
+          });
+        });
+
+        text += `\n👥 Total: ${players.length} jogadores em ${teams.length} times`;
+
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showToast("✅ Times copiados para a área de transferência!");
+          })
+          .catch(() => {
+            showToast("Erro ao copiar os times.", "danger");
+          });
+      }
+
+      function showToast(message, type = "success") {
+        const toastEl = document.getElementById("feedbackToast");
+        const toastBody = toastEl.querySelector(".toast-body");
+
+        toastEl.classList.remove("bg-success", "bg-danger", "bg-info");
+        toastEl.classList.add(`bg-${type}`);
+        toastBody.textContent = message;
+
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+      }
+
+      function copyToClipboard(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        alert("Times copiados para a área de transferência!");
+      }
+
+      function updateCounts() {
+        const perTeam = +document.getElementById("playersPerTeam").value;
+        const totalTeams =
+          perTeam > 0 ? Math.floor(players.length / perTeam) : 0;
+
+        document.getElementById("playersCount").textContent = players.length;
+        document.getElementById("totalPlayers").textContent = players.length;
+        document.getElementById("totalTeams").textContent = totalTeams;
+
+        // Atualiza estado do botão de sorteio
+        document.getElementById("drawBtn").disabled =
+          players.length < perTeam || players.length < 2;
+      }
+
+      function savePlayers() {
+        localStorage.setItem("volleyballPlayers", JSON.stringify(players));
+      }
+
+      // Atualiza contagens quando muda o número de jogadores por time
+      document
+        .getElementById("playersPerTeam")
+        .addEventListener("change", updateCounts);
+    </script>
+    <!-- Toast de Feedback -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+      <div
+        id="feedbackToast"
+        class="toast align-items-center text-white bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">✅ Copiado para a área de transferência!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Fechar"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="confirmClearModal"
+      tabindex="-1"
+      aria-labelledby="confirmClearLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmClearLabel">
+              <i class="fas fa-exclamation-triangle me-2"></i> Confirmar Limpeza
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Tem certeza que deseja remover
+            <strong>todos os jogadores</strong> da lista?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              onclick="confirmClearPlayers()"
+            >
+              Sim, limpar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <footer
+    class="text-center text-muted py-3"
+    style="font-size: 0.9rem; border-top: 1px solid #ddd; margin-top: 3rem"
+  >
+    Desenvolvido e pensado por <strong>Ismael Freitas</strong> &copy; 2025
+  </footer>
+</html>
